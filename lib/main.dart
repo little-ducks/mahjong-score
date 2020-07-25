@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:mahjong_scorebook/game_score.dart';
 import 'package:mahjong_scorebook/input_score.dart';
 import 'package:mahjong_scorebook/scorebook_model.dart';
 import 'package:mahjong_scorebook/setting.dart';
+import 'package:mahjong_scorebook/view_score.dart';
 
 void main() async {
 
@@ -43,6 +45,7 @@ class MyApp extends StatelessWidget {
         '/setting': (BuildContext context) => SettingPage(),
         '/game_score': (BuildContext context) => BattleScore(),
         '/input_score': (BuildContext context) => InputScore(),
+        '/view_score': (BuildContext context) => ViewScore(),
       },
       navigatorObservers: <NavigatorObserver>[_routeObserver],
     );
@@ -72,7 +75,6 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
 
   /// １ゲームの点数表へ移動
   void _moveGameScore(ScorebookModel model) {
-    //Navigator.of(context).pushNamed('/game_score', arguments: model);
     Navigator.pushNamed(context, '/game_score', arguments: model);
   }
 
@@ -139,6 +141,8 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
   @override
   Widget build(BuildContext context) {
 
+    DateFormat dateFormat = DateFormat('yyyy/MM/dd HH:mm:ss');
+
     return Scaffold(
       appBar: AppBar(
         title: Text("対局一覧"),
@@ -156,7 +160,7 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
                   ),
                   child:  ListTile(
                     leading: const Icon(Icons.event_available, size: 40,),
-                    title: Text(snapshot.data[index].gameDatetime.toIso8601String(),),
+                    title: Text(dateFormat.format(snapshot.data[index].gameDatetime),),
                     onTap: (){
                       _moveGameScore(snapshot.data[index]);
                     },

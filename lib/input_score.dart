@@ -144,6 +144,21 @@ class InputScore extends StatelessWidget {
     MemberScoreModel top = memberScores.firstWhere((element) => element.rank == 1);
     top.calcScore = top.calcScore + oka.abs();
 
+    // ウマ
+    // 1-4
+    MemberScoreModel las = memberScores.firstWhere((element) => element.rank == 4);
+    int uma14 = scorebookModel.uma14 ~/ 1000;
+    las.calcScore = las.calcScore - uma14;
+    top.calcScore = top.calcScore + uma14;
+
+    // 2-3
+    MemberScoreModel r2 = memberScores.firstWhere((element) => element.rank == 2);
+    MemberScoreModel r3 = memberScores.firstWhere((element) => element.rank == 3);
+    int uma23 = scorebookModel.uma23 ~/ 1000;
+    r3.calcScore = r3.calcScore - uma23;
+    r2.calcScore = r2.calcScore + uma23;
+
+
     // ヤキトリとトビの精算
     int yakiPool = 0;
     int tobiPool = 0;
@@ -198,7 +213,8 @@ class InputScore extends StatelessWidget {
       gameScoreModel.gameCount = 1;
       scorebookModel.gameScores = [gameScoreModel];
     } else {
-      gameScoreModel.gameCount = scorebookModel.gameScores.length + 1;
+      int maxGameCount = scorebookModel.gameScores.reduce((value, element) => value.gameCount > element.gameCount ? value : element).gameCount;
+      gameScoreModel.gameCount = maxGameCount + 1;
       scorebookModel.gameScores.add(gameScoreModel);
     }
 
@@ -211,7 +227,7 @@ class InputScore extends StatelessWidget {
       print('${element.member.name} = ${element.calcScore} [${element.rank}]');
     });
 
-    //Navigator.pop(context);
+    Navigator.pop(context, scorebookModel);
 
   }
 
