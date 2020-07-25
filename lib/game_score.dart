@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mahjong_scorebook/scorebook_model.dart';
 import 'package:provider/provider.dart';
 
@@ -104,45 +105,63 @@ class BattleScore extends StatelessWidget {
 
   /// 合計表示
   void _showTotal(BuildContext context, Map<int, String> memberNames, List<GameScoreListModel> gameScores) {
-    List<DataColumn> headers = memberNames.values.map((e) => DataColumn(label: Text(e))).toList();
-    List<DataCell> totalRow = memberNames.keys.map((e){
-      int total = gameScores.map((element) => element.memberScores[e]??0).fold(0, (previousValue, element) => previousValue + element);
 
-      return DataCell(
-          Container(
-            width: double.infinity,
-            child: Text(
-              "${total}",
-              textAlign: TextAlign.end,
-            ),
+    List<Widget> listViewChildren = [];
+    memberNames.forEach((key, value) {
+      int total = gameScores.map((element) => element.memberScores[key]??0).fold(0, (previousValue, element) => previousValue + element);
+      var child = Container(
+        decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(color: Colors.black38),
+            )),
+        child: ListTile(
+          subtitle: Row(
+            children: <Widget>[
+              Expanded(
+                flex: 2,
+                child: Text(
+                  '${value}',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 50.0),
+                  child: Text(
+                    '${total}',
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        onTap: (){
-
-        }
+        ),
       );
-    }).toList();
+      listViewChildren.add(child);
+    });
 
     // ポップアップで合計点表示
     showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
           return Container(
-            height: double.infinity,
+            //height: double.infinity,
             child: Column(
               children: <Widget>[
-                Container(
-                  width: double.infinity,
-                  child: SingleChildScrollView(
-                    child: DataTable(
-                      columns: headers,
-                      rows: [
-                        DataRow(cells: totalRow),
-                      ],
-                    ),
+                Expanded(
+                  child: ListView(
+                    children: listViewChildren,
                   ),
                 ),
-                Expanded(
-                  child: Center(
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 50),
                     child: RaisedButton(
                       child: Text('閉じる'),
                       onPressed: () {
@@ -168,7 +187,7 @@ class BattleScore extends StatelessWidget {
       {"トビ" : scorebookModel.tobi},
     ];
 
-    // ポップアップで合計点表示
+    // ポップアップで設定点表示
     showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
@@ -188,8 +207,34 @@ class BattleScore extends StatelessWidget {
                           ),
                         ),
                         child: ListTile(
-                          title: Text(data[index].keys.first),
-                          subtitle: Text('${data[index].values.first}'),
+                          //title: Text(data[index].keys.first),
+                          //subtitle: Text('${data[index].values.first}'),
+                          subtitle: Row(
+                            children: <Widget>[
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  '${data[index].keys.first}',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 50),
+                                  child: Text(
+                                    '${data[index].values.first}',
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     }
@@ -217,13 +262,16 @@ class BattleScore extends StatelessWidget {
 
     ScorebookModel scorebookModel = ModalRoute.of(context).settings.arguments;
 
+    DateFormat dateFormat = DateFormat('yyyy/MM/dd HH:mm:ss');
+    String gameDatetime = dateFormat.format(scorebookModel.gameDatetime);
+
     return ChangeNotifierProvider<BattleScoreModel>(
       create: (context) => _initData(scorebookModel),
       child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),  // キーボード隠す
           child: Scaffold(
             appBar: AppBar(
-            title: Text('点数表'),
+            title: Text('スコアブック'),
             ),
             body: Consumer<BattleScoreModel>(
               builder: (context, model, child) {
@@ -233,14 +281,32 @@ class BattleScore extends StatelessWidget {
                     child: PaginatedDataTable(
                       showCheckboxColumn: false,
                       columns: [
-                        DataColumn(label: Text("回"),),
+                        DataColumn(
+                          label: Container(
+                            child: Text(
+                              "回",
+                              style: TextStyle(
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ),
                         for (var name in model.memberNames.values) DataColumn(
-                          label: Text(name),
+                          label: Text(
+                            name,
+                            style: TextStyle(
+                              fontSize: 15,
+                            ),
+                          ),
                           numeric: true,
                         )
                       ],
                       header: Container(
-                        height: 0,
+
+                        child: Text(
+                            '対戦日時：${gameDatetime}',
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                       source: _createDatasource(context, model, scorebookModel),
                       rowsPerPage: 10,
