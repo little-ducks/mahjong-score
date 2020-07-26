@@ -81,7 +81,13 @@ class BattleScore extends StatelessWidget {
 
       List<DataCell> cells = [
         DataCell(
-          Text("${e.gameNo}"),
+          Container(
+            width: double.infinity,
+            child: Text(
+              "${e.gameNo}",
+              textAlign: TextAlign.end,
+            ),
+          ),
           onTap: () {
             handleOnTap(e);
           },
@@ -271,7 +277,7 @@ class BattleScore extends StatelessWidget {
           onTap: () => FocusScope.of(context).unfocus(),  // キーボード隠す
           child: Scaffold(
             appBar: AppBar(
-            title: Text('スコアブック'),
+              title: Text('スコアブック'),
             ),
             body: Consumer<BattleScoreModel>(
               builder: (context, model, child) {
@@ -290,6 +296,7 @@ class BattleScore extends StatelessWidget {
                               ),
                             ),
                           ),
+                          numeric: true,
                         ),
                         for (var name in model.memberNames.values) DataColumn(
                           label: Text(
@@ -310,6 +317,7 @@ class BattleScore extends StatelessWidget {
                       ),
                       source: _createDatasource(context, model, scorebookModel),
                       rowsPerPage: 10,
+                      columnSpacing: 40,
                     ),
                   ),
                 );
