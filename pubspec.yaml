@@ -41,6 +41,12 @@ dev_dependencies:
 
   hive_generator: ^0.7.0+2
   build_runner: ^1.10.0
+  flutter_launcher_icons: ^0.7.4
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: 'lib/assets/icon.png'
 
 dependency_overrides:
   dartx: ^0.3.0
