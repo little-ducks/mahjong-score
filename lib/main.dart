@@ -81,6 +81,7 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
   /// BDから対局を取得する
   void _readScorebook() {
     this._scorebookList = Hive.box<ScorebookModel>("mahjong_scorebook").values.toList();
+    this._scorebookList.sort((m1, m2) => m1.gameDatetime.compareTo(m2.gameDatetime) * -1);
     _onChangeScorebookList.sink.add(this._scorebookList);
   }
 
