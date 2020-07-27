@@ -189,7 +189,7 @@ class BattleScore extends StatelessWidget {
     List<Map<String, int>> data = [
       {"ウマ1-4" : scorebookModel.uma14},
       {"ウマ2-3" : scorebookModel.uma23},
-      {"ヤキトリ" : scorebookModel.uma14},
+      {"ヤキトリ" : scorebookModel.yaki},
       {"トビ" : scorebookModel.tobi},
     ];
 
