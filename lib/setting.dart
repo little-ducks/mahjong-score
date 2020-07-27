@@ -74,8 +74,8 @@ class SettingPage extends StatelessWidget {
 
     // 2000と3000の倍数（１人か２人か３人かに分配するから）
     final num = int.parse(value);
-    if ((num % 2000) != 0 || (num % 3000) != 0) {
-      return "2人にも3人にも分配できる点数にしてください。";
+    if ((num % 3000) != 0) {
+      return "3人に分配できる点数にしてください。";
     }
 
     return null;
