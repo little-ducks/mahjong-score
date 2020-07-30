@@ -7,10 +7,8 @@ import 'package:provider/provider.dart';
 
 class InputScore extends StatelessWidget {
 
-  /// インプットパラメータ
-  //final ScorebookModel model = null;
-
-  //InputScore(this.model);
+  /// FORM KEY
+  final _formKey = GlobalKey<FormState>();
 
   /// 最初のデータ
   InputScoreModel _initData(ScorebookModel scorebookModel) {
@@ -67,13 +65,28 @@ class InputScore extends StatelessWidget {
 
   /// 入力保存確認
   void _confirmSaveInputScore(BuildContext context, InputScoreModel inputScoreModel) {
+
+    String confirmMessage = "保存してよろしいですか？";
+
+    // 同じ点数があったら警告出す
+    bool difScore = inputScoreModel.memberScores.every((m1) {
+
+      int saveScoreCount = inputScoreModel.memberScores.where((m2) => m1.score == m2.score && m1 != m2).length;
+
+      return saveScoreCount == 0;
+    });
+
+    if (!difScore) {
+      confirmMessage = "同じ点数の人がいます。\n順位はアプリが自動で付けます。\nよろしいですか？\nだめな場合は、1点でも差をつけてください。";
+    }
+
     // 一応確認
     showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('保存してよろしいですか？'),
+          title: Text(confirmMessage),
           content: Text(
             '合計点数:${inputScoreModel.total}',
             style: TextStyle(
@@ -100,8 +113,26 @@ class InputScore extends StatelessWidget {
     );
   }
 
+  /// 入力チェック
+  String _validateScore(String value) {
+
+    if (value.isEmpty) {
+      return "点数を入力してください。";
+    }
+
+    final int score = int.tryParse(value);
+    if (score == null) {
+      return "数字で入力してください。";
+    }
+
+    return null;
+
+  }
+
   /// 入力保存
   void _saveInputScore(BuildContext context, InputScoreModel inputScoreModel) {
+
+
 
     ScorebookModel scorebookModel = inputScoreModel.scorebookModel;
     List<MemberModel> members = scorebookModel.members;
@@ -120,7 +151,7 @@ class InputScore extends StatelessWidget {
       int calcScore = score.score ~/ 1000;
 
       // 1000点未満があって、30000点未満の場合は切り上げ
-      if (u1000 > 0 && e.score < 30000) {
+      if (u1000 > 100 && e.score < 30000) {
         calcScore = calcScore + 1;
       }
 
@@ -247,6 +278,7 @@ class InputScore extends StatelessWidget {
                   title: Text('点数入力'),
                 ),
                 body: Form(
+                  key: _formKey,
                   child: Column(
                     children: <Widget>[
                       Expanded(
@@ -286,6 +318,7 @@ class InputScore extends StatelessWidget {
                                             WhitelistingTextInputFormatter
                                                 .digitsOnly
                                           ],
+                                          validator: _validateScore,
                                           onChanged: (e) {
                                             _inputScore(model, e, index);
                                           },
@@ -387,7 +420,9 @@ class InputScore extends StatelessWidget {
                 // 入力登録
                 floatingActionButton: FloatingActionButton(
                   onPressed: () {
-                    _confirmSaveInputScore(context, model);
+                    if (_formKey.currentState.validate()) {
+                      _confirmSaveInputScore(context, model);
+                    }
                   },
                   child: Icon(Icons.save),
                 ),
