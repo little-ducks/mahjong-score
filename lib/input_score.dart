@@ -110,7 +110,7 @@ class InputScore extends StatelessWidget {
     List<MemberScoreModel> memberScores = inputScoreModel.memberScores.map((e) {
       MemberScoreModel score = MemberScoreModel()
           ..member = members.firstWhere((mem) => mem.id == e.memberId)
-          ..score = e.score
+          ..score = e.score??0
           ..yaki = e.yaki;
 
       // 1000点未満取得
